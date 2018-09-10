@@ -4,21 +4,26 @@
  * and open the template in the editor.
  */
 package com.github.lespaul361.javadocplugin;
+
+import java.util.Properties;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 /**
  *
  * @author David Hamilton
  */
-@Mojo(name="Javadoc Fill In")
-public class JavaDocFillIn extends AbstractMojo{
+@Mojo(name = "javadocfiller")
+public class JavaDocFillIn extends AbstractMojo {
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void execute() throws MojoExecutionException , MojoFailureException{
+        getLog().info("Hello, world.");
     }
-
-
+    @Parameter 
+    private Properties properties;
 }
+
