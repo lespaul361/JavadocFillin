@@ -58,6 +58,7 @@ public abstract class AbstractJavadocFillInMojo
             loadFillersFromConfigFile(configFile);
         }
         loadFillersFromPOM(fillers);
+        loadExceptionsFromPOM(exceptions);
         this.javaFiles = getFiles();
         doExecute();
     }
@@ -123,8 +124,31 @@ public abstract class AbstractJavadocFillInMojo
 
     }
 
+    /**
+     * Loads in the fillers from the list made in the POM
+     *
+     * @param fillers the list of fillers made in the POM
+     */
     protected void loadFillersFromPOM(List<Filler> fillers) {
+        fillers.forEach(filler -> {
+            if (filler.variable != null && !filler.variable.isEmpty()) {
+                fillersMap.put(filler.variable, filler.text);
+            }
+        });
 
+    }
+
+    /**
+     * Loads in the fillers from the list made in the POM
+     *
+     * @param fillers the list of fillers made in the POM
+     */
+    protected void loadExceptionsFromPOM(List<com.github.lespaul361.maven.plugins.javadocfillerplugin.Exception> exceptions) {
+        exceptions.forEach(exception -> {
+            if (exception.name != null && !exception.name.isEmpty()) {
+                fillersMap.put(exception.name, exception.description);
+            }
+        });
     }
 
     /**
@@ -166,5 +190,5 @@ public abstract class AbstractJavadocFillInMojo
         return files;
     }
 
-    abstract void doExecute() throws MojoExecutionException, MojoFailureException;
+    public abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 }
