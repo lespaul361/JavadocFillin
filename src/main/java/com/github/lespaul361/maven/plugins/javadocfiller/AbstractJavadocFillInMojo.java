@@ -65,6 +65,8 @@ public abstract class AbstractJavadocFillInMojo
 
     /**
      * Loads in the information from the configuration file if provided
+     *
+     * @param file the location of the configuration file
      */
     protected void loadFillersFromConfigFile(File file) {
         if (!file.exists()) {
@@ -96,6 +98,8 @@ public abstract class AbstractJavadocFillInMojo
 
     /**
      * Loads in the information from the configuration file if provided
+     *
+     * @param file the location of the configuration file
      */
     protected void loadExceptionsFromConfigFile(File file) {
         if (!file.exists()) {
@@ -141,7 +145,7 @@ public abstract class AbstractJavadocFillInMojo
     /**
      * Loads in the fillers from the list made in the POM
      *
-     * @param fillers the list of fillers made in the POM
+     * @param exceptions the list of exceptions made in the POM
      */
     protected void loadExceptionsFromPOM(List<com.github.lespaul361.maven.plugins.javadocfiller.Exception> exceptions) {
         exceptions.forEach(exception -> {
@@ -190,5 +194,11 @@ public abstract class AbstractJavadocFillInMojo
         return files;
     }
 
+    /**
+     * Executes the code
+     *
+     * @throws MojoExecutionException
+     * @throws MojoFailureException
+     */
     public abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 }
