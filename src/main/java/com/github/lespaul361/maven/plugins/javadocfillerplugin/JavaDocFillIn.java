@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.lespaul361.javadocplugin;
+package com.github.lespaul361.maven.plugins.javadocfillerplugin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,7 +14,9 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -39,11 +41,16 @@ import org.jdom2.input.SAXBuilder;
 public class JavaDocFillIn extends AbstractMojo {
     
     private String encoding = null;
+    private Map<String,String> fillersMap=new HashMap<>();
+    private Map<String,String> exceptionsMap=new HashMap<>();
     @Parameter(defaultValue = "${project}")
     private MavenProject project;
     
     @Parameter
     private List<Filler> fillers;
+    
+    @Parameter
+    private List<Filler> exceptions;
     
     @Parameter(defaultValue = "")
     private String configurationFile;
