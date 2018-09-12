@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.github.lespaul361.maven.plugins.javadocfillerplugin;
+package com.github.lespaul361.maven.plugins.javadocfiller;
 
 import org.apache.maven.plugins.annotations.Parameter;
 

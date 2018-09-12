@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.lespaul361.maven.plugins.javadocfillerplugin;
+package com.github.lespaul361.maven.plugins.javadocfiller;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
@@ -82,6 +83,20 @@ abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFi
             }
         } catch (java.lang.Exception efis) {
             efis.printStackTrace(System.err);
+        }
+        
+        if(isUpdated){
+            writeFile(file, sbNewFile.toString());
+        }
+    }
+
+    private void writeFile(File file, String fileData) {
+        try (FileWriter fw = new FileWriter(file)) {
+            fw.write(fileData);
+            fw.flush();
+            fw.close();
+        } catch (java.lang.Exception e) {
+            e.printStackTrace(System.err);
         }
     }
 

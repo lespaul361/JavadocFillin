@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.lespaul361.maven.plugins.javadocfillerplugin;
+package com.github.lespaul361.maven.plugins.javadocfiller;
 
 import java.io.File;
 import java.util.ArrayDeque;
@@ -30,10 +30,10 @@ import org.jdom2.input.SAXBuilder;
 public abstract class AbstractJavadocFillInMojo
         extends AbstractMojo {
 
-    private String encoding = null;
-    private Map<String, String> fillersMap = new HashMap<>();
-    private Map<String, String> exceptionsMap = new HashMap<>();
-    private List<File> javaFiles = null;
+    protected String encoding = null;
+    protected Map<String, String> fillersMap = new HashMap<>();
+    protected Map<String, String> exceptionsMap = new HashMap<>();
+    protected List<File> javaFiles = null;
 
     @Parameter(defaultValue = "${project}")
     private MavenProject project;
@@ -42,7 +42,7 @@ public abstract class AbstractJavadocFillInMojo
     private List<Filler> fillers;
 
     @Parameter
-    private List<com.github.lespaul361.maven.plugins.javadocfillerplugin.Exception> exceptions;
+    private List<com.github.lespaul361.maven.plugins.javadocfiller.Exception> exceptions;
 
     @Parameter(defaultValue = "")
     private String configurationFile;
@@ -143,7 +143,7 @@ public abstract class AbstractJavadocFillInMojo
      *
      * @param fillers the list of fillers made in the POM
      */
-    protected void loadExceptionsFromPOM(List<com.github.lespaul361.maven.plugins.javadocfillerplugin.Exception> exceptions) {
+    protected void loadExceptionsFromPOM(List<com.github.lespaul361.maven.plugins.javadocfiller.Exception> exceptions) {
         exceptions.forEach(exception -> {
             if (exception.name != null && !exception.name.isEmpty()) {
                 fillersMap.put(exception.name, exception.description);

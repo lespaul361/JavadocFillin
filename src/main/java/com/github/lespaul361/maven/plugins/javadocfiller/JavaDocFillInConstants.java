@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.lespaul361.maven.plugins.javadocfillerplugin;
+package com.github.lespaul361.maven.plugins.javadocfiller;
 
 /**
  *
@@ -26,7 +26,7 @@ interface JavaDocFillInConstants {
      */
     static final String START_JAVADOC = "/**";
 
-    /**
+    /** 
      * End Javadoc String i.e. <code>&#42;&#47;</code> *
      */
     static final String END_JAVADOC = "*/";
@@ -35,4 +35,9 @@ interface JavaDocFillInConstants {
      * Javadoc Separator i.e. <code> &#42; </code> *
      */
     static final String SEPARATOR_JAVADOC = " * ";
+    
+    /**
+     * Javadoc tag start symbol i.e. <code>&#64;</code>
+     */
+    static final String START_OF_TAG = "@";
 }
