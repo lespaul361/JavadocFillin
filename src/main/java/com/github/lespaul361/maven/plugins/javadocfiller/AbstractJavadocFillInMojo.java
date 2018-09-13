@@ -52,14 +52,21 @@ public abstract class AbstractJavadocFillInMojo
         Properties properties = project.getProperties();
         encoding = properties.getProperty("project.build.sourceEncoding", "");
         encoding = encoding.isEmpty() ? "UTF-8" : encoding;
+        getLog().info("Encoding: " + encoding);
         if (configurationFile != null && !configurationFile.trim().isEmpty()) {
             File configFile = new File(configurationFile);
+            getLog().info("Loaded " + configurationFile);
             loadExceptionsFromConfigFile(configFile);
+            getLog().info("Loaded Exceptions From file");
             loadFillersFromConfigFile(configFile);
+            getLog().info("Loaded Variables From file");
         }
         loadFillersFromPOM(fillers);
+        getLog().info("Loaded Variables From POM");
         loadExceptionsFromPOM(exceptions);
+        getLog().info("Loaded Exceptions From POM");
         this.javaFiles = getFiles();
+        getLog().info("Total Java Files: " + this.javaFiles.size());
         doExecute();
     }
 
@@ -81,6 +88,7 @@ public abstract class AbstractJavadocFillInMojo
             Element root = doc.getRootElement();
             Element element = root.getChild("fillers");
             List<Element> elements = element.getChildren();
+
             elements.forEach(el -> {
                 if (el.getChildText("variable") != null
                         && !el.getChildText("variable").isEmpty()) {
@@ -88,7 +96,6 @@ public abstract class AbstractJavadocFillInMojo
                             el.getChildText("text"));
                 }
             });
-
             sax = null;
         } catch (java.lang.Exception e) {
             e.printStackTrace(System.err);
@@ -112,7 +119,7 @@ public abstract class AbstractJavadocFillInMojo
             SAXBuilder sax = new SAXBuilder();
             Document doc = sax.build(file);
             Element root = doc.getRootElement();
-            Element element = root.getChild("fillers");
+            Element element = root.getChild("exceptions");
             List<Element> elements = element.getChildren();
             elements.forEach(el -> {
                 if (el.getChildText("name") != null
@@ -121,6 +128,7 @@ public abstract class AbstractJavadocFillInMojo
                             el.getChildText("description"));
                 }
             });
+
             sax = null;
         } catch (java.lang.Exception e) {
             e.printStackTrace(System.err);
@@ -134,6 +142,9 @@ public abstract class AbstractJavadocFillInMojo
      * @param fillers the list of fillers made in the POM
      */
     protected void loadFillersFromPOM(List<Filler> fillers) {
+        if (fillers == null) {
+            return;
+        }
         fillers.forEach(filler -> {
             if (filler.variable != null && !filler.variable.isEmpty()) {
                 fillersMap.put(filler.variable, filler.text);
@@ -148,6 +159,9 @@ public abstract class AbstractJavadocFillInMojo
      * @param exceptions the list of exceptions made in the POM
      */
     protected void loadExceptionsFromPOM(List<com.github.lespaul361.maven.plugins.javadocfiller.Exception> exceptions) {
+        if (exceptions == null) {
+            return;
+        }
         exceptions.forEach(exception -> {
             if (exception.name != null && !exception.name.isEmpty()) {
                 fillersMap.put(exception.name, exception.description);
@@ -166,7 +180,9 @@ public abstract class AbstractJavadocFillInMojo
         allFiles.addAll(Arrays.asList(baseDir.listFiles()));
         List<File> files = new ArrayList<>();
         File curFile = null;
+        getLog().info(ROLE);
         while ((curFile = allFiles.poll()) != null) {
+
             if (curFile.isDirectory()) {
                 files.addAll(recurseDirectories(curFile));
             } else {

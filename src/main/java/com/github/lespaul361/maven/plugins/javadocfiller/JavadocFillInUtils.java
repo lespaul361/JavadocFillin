@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author David Hamilton
  */
-class JavadocFillInUtils implements JavaDocFillInConstants {
+public class JavadocFillInUtils implements JavaDocFillInConstants {
 
     public static String replaceVariables(String javadocComment, Map<String, String> variables) {
         Iterator<String> iterator = variables.keySet().iterator();
@@ -25,10 +25,9 @@ class JavadocFillInUtils implements JavaDocFillInConstants {
     }
 
     public static String addGenericDescriptionForException(String javadocComment, Map<String, String> exs) {
-        String[] lines = javadocComment.split(JavaDocFillInConstants.EOL);
+        String[] lines = javadocComment.split(System.lineSeparator());
         StringBuilder sbRet = new StringBuilder(600);
         String exceptionName = "";
-        int lineCount = lines.length;
         int curLine = 0;
         boolean isUpdated = false;
         while (true) {
@@ -126,7 +125,7 @@ class JavadocFillInUtils implements JavaDocFillInConstants {
             sb.append(System.lineSeparator());
             return sb.toString();
         }
-        sb.append(" ").append(desc).append(EOL);
+        sb.append(" ").append(desc).append(EOL);        
         return sb.toString();
 
     }

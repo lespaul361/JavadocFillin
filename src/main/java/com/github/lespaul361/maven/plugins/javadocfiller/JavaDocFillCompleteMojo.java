@@ -24,8 +24,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  *
  * @author David Hamilton
  */
-@Mojo(name = "fill-all", requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
-@Execute(phase = LifecyclePhase.COMPILE)
+@Mojo(name = "fill-all", defaultPhase=LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
+@Execute(phase = LifecyclePhase.GENERATE_SOURCES)
 public class JavaDocFillCompleteMojo extends AbstractJavadocFillInMojo {
 
     @Override
