@@ -31,7 +31,7 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
         int curLine = 0;
         boolean isUpdated = false;
         while (true) {
-            if(curLine==lines.length){
+            if (curLine == lines.length) {
                 break;
             }
             String tmpLine = new String(lines[curLine]);
@@ -63,12 +63,16 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
                         isUpdated = true;
                         curLine++;
                         continue;
+                    } else {
+                        sbRet.append(tmpLine).append(EOL);
+                        curLine++;
+                        continue;
                     }
                 }
 
             }
         }
-        if(isUpdated){
+        if (isUpdated) {
             return sbRet.toString();
         }
         return javadocComment;
@@ -76,13 +80,33 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
 
     private static boolean lineHasThrowsDescription(String line) {
         if (line.toLowerCase().contains(THROWS_TAG.toLowerCase())) {
-            String tmp = line.substring(line.toLowerCase().indexOf(THROWS_TAG.toLowerCase()) + THROWS_TAG.length());
-            if (tmp.trim().isEmpty()) {
-                return true;
+            String[] parts = line.trim().split("\\s+");
+            int i = 0;
+            while (i < parts.length) {
+                if (parts[i].toLowerCase().contains(THROWS_TAG.toLowerCase())) {
+                    i++;
+                    break;
+                }
+                i++;
             }
-        }
-        return false;
+            while (i < parts.length) {
+                if (!parts[i].trim().isEmpty()) {
+                    i++;
+                    break;
+                }
+                i++;
+            }
 
+            while (i < parts.length) {
+                if (!parts[i].trim().isEmpty()) {
+                    return true;
+                }
+                i++;
+            }
+            return false;
+        }
+        String tmp = line.substring(line.toLowerCase().indexOf(SEPARATOR_JAVADOC.toLowerCase()) + SEPARATOR_JAVADOC.length());
+        return !tmp.trim().isEmpty();
     }
 
     private static boolean newTagLine(String line) {
@@ -125,7 +149,7 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
             sb.append(System.lineSeparator());
             return sb.toString();
         }
-        sb.append(" ").append(desc).append(EOL);        
+        sb.append(" ").append(desc).append(EOL);
         return sb.toString();
 
     }

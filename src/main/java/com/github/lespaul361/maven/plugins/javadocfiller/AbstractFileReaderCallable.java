@@ -50,8 +50,7 @@ abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFi
                     StringBuilder commentBuilder = new StringBuilder(2_000);
                     while ((line = br.readLine()) != null) {
                         if (!isJavadoc && !line.trim().startsWith(START_JAVADOC)) {
-                            sbNewFile.append(line);
-                            sbNewFile.append(EOL);
+                            sbNewFile.append(line).append(EOL);
                             continue;
                         } else if (!isJavadoc && line.trim().startsWith(START_JAVADOC)) {
                             isJavadoc = true;
@@ -66,6 +65,8 @@ abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFi
                             if (!commentBuilder.toString().equals(processed)) {
                                 isUpdated = true;
                                 sbNewFile.append(processed);
+                            }else{
+                                sbNewFile.append(commentBuilder);
                             }
                             commentBuilder = new StringBuilder(2_000);
                             isJavadoc = false;

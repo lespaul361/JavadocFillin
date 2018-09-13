@@ -6,7 +6,7 @@
 package com.github.lespaul361.maven.plugins.javadocfiller;
 
 /**
- *
+ * 
  * @author David Hamilton
  */
 interface JavaDocFillInConstants {
@@ -26,7 +26,7 @@ interface JavaDocFillInConstants {
      */
     static final String START_JAVADOC = "/**";
 
-    /** 
+    /**
      * End Javadoc String i.e. <code>&#42;&#47;</code> *
      */
     static final String END_JAVADOC = "*/";
@@ -35,7 +35,7 @@ interface JavaDocFillInConstants {
      * Javadoc Separator i.e. <code> &#42; </code> *
      */
     static final String SEPARATOR_JAVADOC = " * ";
-    
+
     /**
      * Javadoc tag start symbol i.e. <code>&#64;</code>
      */
