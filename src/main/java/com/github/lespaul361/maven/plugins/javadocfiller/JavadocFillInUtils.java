@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class JavadocFillInUtils implements JavaDocFillInConstants {
 
-    public static String replaceVariables(String javadocComment, Map<String, String> variables) {
+    public static synchronized String replaceVariables(String javadocComment, Map<String, String> variables) {
         Iterator<String> iterator = variables.keySet().iterator();
         String var = null;
         while (iterator.hasNext()) {
@@ -24,133 +24,57 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
         return javadocComment;
     }
 
-    public static String addGenericDescriptionForException(String javadocComment, Map<String, String> exs) {
-        String[] lines = javadocComment.split(System.lineSeparator());
-        StringBuilder sbRet = new StringBuilder(600);
-        String exceptionName = "";
-        int curLine = 0;
-        boolean isUpdated = false;
-        while (true) {
-            if (curLine == lines.length) {
-                break;
+    public static synchronized String addGenericDescriptionForException(String javadocComment, Map<String, String> exs) {
+        if (!javadocComment.contains(THROWS_TAG)) {
+            return javadocComment;
+        }
+
+        String[] throwSplits = javadocComment.split("(\\bthrows\\b)");
+        StringBuilder sbNewComment = new StringBuilder(200);
+        sbNewComment.append(throwSplits[0]);
+        String curThrowName = null;
+        for (int i = 1; i < throwSplits.length; i++) {
+            char sp = sbNewComment.charAt(sbNewComment.length() - 1);
+            if (Character.compare(sp, " ".charAt(0)) == 0) {
+                sbNewComment.replace(sbNewComment.length() - 2, sbNewComment.length() - 1, "");
             }
-            String tmpLine = new String(lines[curLine]);
-            if (!tmpLine.toLowerCase().contains(THROWS_TAG.toLowerCase())) {
-                sbRet.append(lines[curLine]).append(EOL);
-                curLine++;
-                continue;
-            } else {
-                exceptionName = getExceptionName(tmpLine);
-                if (lineHasThrowsDescription(tmpLine)) {
-                    sbRet.append(tmpLine).append(EOL);
-                    curLine++;
-                    continue;
-                } else {
-                    boolean noDesc = false;
-                    int tmpCount = curLine + 1;
-                    while (tmpCount < lines.length) {
-                        if (newTagLine(lines[tmpCount]) || endOfJavadocComment(lines[tmpCount])) {
-                            noDesc = true;
-                            break;
+            String[] lines = throwSplits[i].split(EOL);
+            String[] lineParts = lines[0].trim().split("\\s+");
+            curThrowName = lineParts[0];
+            sbNewComment.append(" ").append(THROWS_TAG).append(" ");
+            if (lineParts.length == 1) {
+                if (lines.length > 1) {
+                    String[] nextLineParts = lines[1].trim().split("\\s+");
+                    if (nextLineParts[0].trim().equals(END_JAVADOC.trim())
+                            || nextLineParts[1].equals(SEPARATOR_JAVADOC.trim())
+                            || nextLineParts[1].equals(START_OF_TAG.trim())) {
+                        String desc = exs.get(curThrowName);
+                        if (desc != null) {
+                            sbNewComment.append(" ")
+                                    .append(curThrowName)
+                                    .append(" ")
+                                    .append(desc)
+                                    .append(EOL);
+                            for (int ii = 1; ii < lines.length; ii++) {
+                                sbNewComment.append(lines[ii]);
+                            }
+                        } else {
+                            sbNewComment.append(" ")
+                                    .append(curThrowName)
+                                    .append(EOL);
+                            if (lines.length > 0) {
+                                for (int ii = 1; ii < lines.length; ii++) {
+                                    sbNewComment.append(lines[ii]);
+                                }
+                            }
                         }
-                        if (lineHasThrowsDescription(lines[tmpCount])) {
-                            break;
-                        }
-                        tmpCount++;
-                    }
-                    if (noDesc) {
-                        sbRet.append(getThrowComment(tmpLine, exceptionName, exs));
-                        isUpdated = true;
-                        curLine++;
-                        continue;
                     } else {
-                        sbRet.append(tmpLine).append(EOL);
-                        curLine++;
-                        continue;
+                        sbNewComment.append(throwSplits[i]);
                     }
                 }
-
             }
         }
-        if (isUpdated) {
-            return sbRet.toString();
-        }
-        return javadocComment;
-    }
 
-    private static boolean lineHasThrowsDescription(String line) {
-        if (line.toLowerCase().contains(THROWS_TAG.toLowerCase())) {
-            String[] parts = line.trim().split("\\s+");
-            int i = 0;
-            while (i < parts.length) {
-                if (parts[i].toLowerCase().contains(THROWS_TAG.toLowerCase())) {
-                    i++;
-                    break;
-                }
-                i++;
-            }
-            while (i < parts.length) {
-                if (!parts[i].trim().isEmpty()) {
-                    i++;
-                    break;
-                }
-                i++;
-            }
-
-            while (i < parts.length) {
-                if (!parts[i].trim().isEmpty()) {
-                    return true;
-                }
-                i++;
-            }
-            return false;
-        }
-        String tmp = line.substring(line.toLowerCase().indexOf(SEPARATOR_JAVADOC.toLowerCase()) + SEPARATOR_JAVADOC.length());
-        return !tmp.trim().isEmpty();
-    }
-
-    private static boolean newTagLine(String line) {
-        if (line.trim().startsWith(SEPARATOR_JAVADOC)) {
-            String tmpString = line.substring(line.indexOf(SEPARATOR_JAVADOC) + SEPARATOR_JAVADOC.length());
-            if (tmpString.trim().startsWith(START_OF_TAG)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean endOfJavadocComment(String line) {
-        return line.trim().startsWith(END_JAVADOC);
-    }
-
-    private static String getExceptionName(String line) {
-        String[] lineParts = line.split("\\s+");
-
-        int curLinePart = 0;
-
-        while (curLinePart < lineParts.length) {
-            if (lineParts[curLinePart].toLowerCase().contains(THROWS_TAG)) {
-                break;
-            } else {
-                curLinePart++;
-            }
-        }
-        curLinePart++;
-
-        return lineParts[curLinePart];
-    }
-
-    private static String getThrowComment(String line, String exceptionName, Map<String, String> map) {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append(line.substring(0, line.toLowerCase().indexOf(THROWS_TAG.toLowerCase()) + THROWS_TAG.length()));
-        sb.append(" ").append(exceptionName);
-        String desc = map.get(exceptionName);
-        if (desc == null) {
-            sb.append(System.lineSeparator());
-            return sb.toString();
-        }
-        sb.append(" ").append(desc).append(EOL);
-        return sb.toString();
-
+        return sbNewComment.toString();
     }
 }

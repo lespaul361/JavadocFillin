@@ -65,6 +65,7 @@ public abstract class AbstractJavadocFillInMojo
         getLog().info("Loaded Variables From POM");
         loadExceptionsFromPOM(exceptions);
         getLog().info("Loaded Exceptions From POM");
+        exceptionsMap.keySet().forEach(key->getLog().info(key + " = "+exceptionsMap.get(key)));
         this.javaFiles = getFiles();
         getLog().info("Total Java Files: " + this.javaFiles.size());
         doExecute();
@@ -125,10 +126,10 @@ public abstract class AbstractJavadocFillInMojo
                 if (el.getChildText("name") != null
                         && !el.getChildText("name").isEmpty()) {
                     exceptionsMap.put(el.getChildText("name"),
-                            el.getChildText("description"));
+                            el.getChildText("text"));
                 }
             });
-
+            getLog().info(String.valueOf(exceptionsMap.size()));
             sax = null;
         } catch (java.lang.Exception e) {
             e.printStackTrace(System.err);
@@ -164,9 +165,10 @@ public abstract class AbstractJavadocFillInMojo
         }
         exceptions.forEach(exception -> {
             if (exception.name != null && !exception.name.isEmpty()) {
-                fillersMap.put(exception.name, exception.description);
+                exceptionsMap.put(exception.name, exception.description);
             }
         });
+        System.out.println(exceptionsMap.size());
     }
 
     /**

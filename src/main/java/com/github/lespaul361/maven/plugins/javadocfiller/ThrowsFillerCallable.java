@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author David Hamilton
  */
-public class ThrowsFillerCallable extends AbstractFileReaderCallable {
+ class ThrowsFillerCallable extends AbstractFileReaderCallable {
 
     final Map<String, String> exceptionMap;
 
