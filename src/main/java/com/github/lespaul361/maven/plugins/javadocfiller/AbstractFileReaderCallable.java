@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
  *
  * @author David Hamilton
  */
- abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFillInConstants {
+abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFillInConstants {
 
     private final File file;
     private final String encoding;
@@ -49,18 +49,19 @@ import java.util.concurrent.Callable;
             try (InputStreamReader isr = new InputStreamReader(fis)) {
                 try {
                     br = new BufferedReader(isr);
-                    String javadocComment=null;
-                    while((javadocComment=getNextComment())!=null){
-                        String processed=processJavaDoc(javadocComment);
-                        if(!processed.equals(javadocComment)){
-                            isUpdated=true;
+                    String javadocComment = null;
+                    while ((javadocComment = getNextComment()) != null) {
+                        String processed = processJavaDoc(javadocComment);
+                        if (!processed.equals(javadocComment)) {
+                            isUpdated = true;
                             sbNewFile.append(processed);
+                        } else {
+                            sbNewFile.append(javadocComment);
                         }
                     }
                     br.close();
                     isr.close();
                     fis.close();
-
                 } catch (java.lang.Exception ebr) {
                     ebr.printStackTrace(System.err);
                 }
@@ -90,7 +91,7 @@ import java.util.concurrent.Callable;
             }
             //start of javadoc
             if (!isJavadoc && curLine.trim().equals(START_JAVADOC)) {
-                sbComment = new StringBuilder(200);                
+                sbComment = new StringBuilder(200);
                 sbOldFile.append(curLine).append(EOL);
                 sbComment.append(curLine).append(EOL);
                 isJavadoc = true;
