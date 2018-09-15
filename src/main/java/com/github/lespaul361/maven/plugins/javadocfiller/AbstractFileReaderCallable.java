@@ -52,6 +52,9 @@ abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFi
                     String javadocComment = null;
                     while ((javadocComment = getNextComment()) != null) {
                         String processed = processJavaDoc(javadocComment);
+                        if (!processed.endsWith(System.lineSeparator())) {
+                            processed += System.lineSeparator();
+                        }
                         if (!processed.equals(javadocComment)) {
                             isUpdated = true;
                             sbNewFile.append(processed);

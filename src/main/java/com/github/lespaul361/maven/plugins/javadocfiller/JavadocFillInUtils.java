@@ -15,6 +15,14 @@ import java.util.Map;
 public class JavadocFillInUtils implements JavaDocFillInConstants {
 
     public static synchronized String replaceVariables(String javadocComment, Map<String, String> variables) {
+        if (javadocComment == null) {
+            throw new NullPointerException("comment is null");
+        }
+        if (!javadocComment.contains(THROWS_TAG)
+                || variables == null
+                || variables.size() == 0) {
+            return javadocComment;
+        }
         Iterator<String> iterator = variables.keySet().iterator();
         String var = null;
         while (iterator.hasNext()) {
@@ -25,7 +33,12 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
     }
 
     public static synchronized String addGenericDescriptionForException(String javadocComment, Map<String, String> exs) {
-        if (!javadocComment.contains(THROWS_TAG)) {
+        if (javadocComment == null) {
+            throw new NullPointerException("comment is null");
+        }
+        if (!javadocComment.contains(THROWS_TAG)
+                || exs == null
+                || exs.size() == 0) {
             return javadocComment;
         }
 
@@ -41,7 +54,7 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
             String[] lines = throwSplits[i].split(EOL);
             String[] lineParts = lines[0].trim().split("\\s+");
             curThrowName = lineParts[0];
-            sbNewComment.append(" ").append(THROWS_TAG).append(" ");
+            sbNewComment.append(THROWS_TAG);
             if (lineParts.length == 1) {
                 if (lines.length > 1) {
                     String[] nextLineParts = lines[1].trim().split("\\s+");
@@ -49,9 +62,11 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
                             || nextLineParts[1].equals(SEPARATOR_JAVADOC.trim())
                             || nextLineParts[1].equals(START_OF_TAG.trim())) {
                         String desc = exs.get(curThrowName);
+                        if (sbNewComment.charAt(sbNewComment.length() - 1) != " ".charAt(0)) {
+                            sbNewComment.append(" ");
+                        }
                         if (desc != null) {
-                            sbNewComment.append(" ")
-                                    .append(curThrowName)
+                            sbNewComment.append(curThrowName)
                                     .append(" ")
                                     .append(desc)
                                     .append(EOL);
@@ -59,20 +74,38 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
                                 sbNewComment.append(lines[ii]);
                             }
                         } else {
-                            sbNewComment.append(" ")
-                                    .append(curThrowName)
+                            sbNewComment.append(curThrowName)
                                     .append(EOL);
                             if (lines.length > 0) {
                                 for (int ii = 1; ii < lines.length; ii++) {
-                                    sbNewComment.append(lines[ii]);
+                                    sbNewComment.append(EOL).append(lines[ii]);
                                 }
                             }
                         }
                     } else {
-                        sbNewComment.append(throwSplits[i]);
+                        sbNewComment.append(throwSplits[i]).append(EOL);
+                    }
+                }
+            } else {
+                StringBuilder sbTemp = new StringBuilder(200);
+                for (int j = 0; j < lineParts.length; j++) {
+                    if (lineParts[j] != null && !lineParts[j].trim().isEmpty()) {
+                        sbTemp.append(lineParts[j]);
+                        if (j < lineParts.length - 1) {
+                            sbTemp.append(" ");
+                        }
+                    }
+                }
+                if (sbTemp.length() > 0) {
+                    sbNewComment.append(sbTemp);
+                }
+                if (lineParts.length > 0) {
+                    for (int ii = 1; ii < lines.length; ii++) {
+                        sbNewComment.append(lines[ii]);
                     }
                 }
             }
+
         }
 
         return sbNewComment.toString();
