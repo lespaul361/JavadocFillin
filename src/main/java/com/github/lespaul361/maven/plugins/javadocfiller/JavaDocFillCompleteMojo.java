@@ -24,7 +24,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  *
  * @author David Hamilton
  */
-@Mojo(name = "fill-all", defaultPhase=LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = false)
+@Mojo(name = "fill-all", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = false)
 @Execute(phase = LifecyclePhase.GENERATE_SOURCES)
 public class JavaDocFillCompleteMojo extends AbstractJavadocFillInMojo {
 
@@ -33,13 +33,14 @@ public class JavaDocFillCompleteMojo extends AbstractJavadocFillInMojo {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         List<Future<String>> futures = new ArrayList<>();
         for (File file : javaFiles) {
-            Callable c = new CompleteFillerCallable(exceptionsMap, fillersMap, file, encoding);
+            Callable c = new CompleteFillerCallable(exceptionsMap, fillersMap,
+                    file, encoding, jdkVersion);
             try {
                 getLog().info("single");
-                getLog().info((String)c.call());
+                getLog().info((String) c.call());
             } catch (java.lang.Exception e) {
             }
-            
+
         }
         futures.forEach(f -> {
             try {

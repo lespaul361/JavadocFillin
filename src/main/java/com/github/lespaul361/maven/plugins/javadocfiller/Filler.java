@@ -17,5 +17,5 @@ public class Filler {
     String variable;
     @Parameter
     String text;
-    
+
 }

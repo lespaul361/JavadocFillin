@@ -24,7 +24,8 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  *
  * @author David Hamilton
  */
-@Mojo(name = "fill-throws-description",defaultPhase=LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
+@Mojo(name = "fill-throws-description", defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+        requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
 @Execute(phase = LifecyclePhase.GENERATE_SOURCES)
 public class JavaDocFillExceptionsMojo extends AbstractJavadocFillInMojo {
 
@@ -33,7 +34,8 @@ public class JavaDocFillExceptionsMojo extends AbstractJavadocFillInMojo {
         ExecutorService executor = Executors.newFixedThreadPool(5);
         List<Future<String>> futures = new ArrayList<>();
         for (File file : javaFiles) {
-            Callable c = new ThrowsFillerCallable(exceptionsMap, file, encoding);
+            Callable c = new ThrowsFillerCallable(exceptionsMap, file,
+                    encoding, jdkVersion);
             futures.add(executor.submit(c));
         }
         futures.forEach(f -> {

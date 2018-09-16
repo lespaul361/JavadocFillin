@@ -14,7 +14,8 @@ import java.util.Map;
  */
 public class JavadocFillInUtils implements JavaDocFillInConstants {
 
-    public static synchronized String replaceVariables(String javadocComment, Map<String, String> variables) {
+    public static synchronized String replaceVariables(String javadocComment,
+            Map<String, String> variables) {
         if (javadocComment == null) {
             throw new NullPointerException("comment is null");
         }
@@ -32,7 +33,8 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
         return javadocComment;
     }
 
-    public static synchronized String addGenericDescriptionForException(String javadocComment, Map<String, String> exs) {
+    public static synchronized String addGenericDescriptionForException(
+            String javadocComment, Map<String, String> exs) {
         if (javadocComment == null) {
             throw new NullPointerException("comment is null");
         }

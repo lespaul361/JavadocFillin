@@ -16,16 +16,17 @@ class VariableFillerCallable extends AbstractFileReaderCallable {
 
     final Map<String, String> variableMap;
 
-    public VariableFillerCallable(Map<String, String> variableMap, File file, String encoding) {
-        super(file, encoding);
+    public VariableFillerCallable(Map<String, String> variableMap, File file,
+            String encoding, String jdkVersion) {
+        super(file, encoding, jdkVersion);
         this.variableMap = variableMap;
     }
 
     @Override
     String processJavaDoc(String javadoc) {
-        String ret=JavadocFillInUtils.replaceVariables(javadoc, this.variableMap);
-        if(!ret.equals(javadoc)){
-            this.isUpdated=true;
+        String ret = JavadocFillInUtils.replaceVariables(javadoc, this.variableMap);
+        if (!ret.equals(javadoc)) {
+            this.isUpdated = true;
             return ret;
         }
         return javadoc;

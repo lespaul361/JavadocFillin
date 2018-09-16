@@ -21,14 +21,16 @@ abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFi
 
     private final File file;
     private final String encoding;
+    private final String jdkVersion;
     protected boolean isUpdated = false;
     StringBuilder sbNewFile = new StringBuilder(500_000);
     private BufferedReader br = null;
     private StringBuilder sbOldFile = new StringBuilder(500_000);
 
-    public AbstractFileReaderCallable(File file, String encoding) {
+    public AbstractFileReaderCallable(File file, String encoding, String jdkVersion) {
         this.file = file;
         this.encoding = encoding;
+        this.jdkVersion = jdkVersion;
     }
 
     public boolean isUpdated() {

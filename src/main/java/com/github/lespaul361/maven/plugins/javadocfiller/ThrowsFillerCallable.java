@@ -12,12 +12,13 @@ import java.util.Map;
  *
  * @author David Hamilton
  */
- class ThrowsFillerCallable extends AbstractFileReaderCallable {
+class ThrowsFillerCallable extends AbstractFileReaderCallable {
 
     final Map<String, String> exceptionMap;
 
-    public ThrowsFillerCallable(Map<String, String> exceptionMap, File file, String encoding) {
-        super(file, encoding);
+    public ThrowsFillerCallable(Map<String, String> exceptionMap, File file,
+            String encoding, String jdkVersion) {
+        super(file, encoding, jdkVersion);
         this.exceptionMap = exceptionMap;
     }
 

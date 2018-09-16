@@ -34,6 +34,7 @@ public abstract class AbstractJavadocFillInMojo
     protected Map<String, String> fillersMap = new HashMap<>();
     protected Map<String, String> exceptionsMap = new HashMap<>();
     protected List<File> javaFiles = null;
+    protected String jdkVersion = "";
 
     @Parameter(defaultValue = "${project}")
     private MavenProject project;
@@ -51,6 +52,7 @@ public abstract class AbstractJavadocFillInMojo
     public void execute() throws MojoExecutionException, MojoFailureException {
         Properties properties = project.getProperties();
         encoding = properties.getProperty("project.build.sourceEncoding", "");
+        jdkVersion = properties.getProperty("maven.compiler.target", "");
         encoding = encoding.isEmpty() ? "UTF-8" : encoding;
         getLog().info("Encoding: " + encoding);
         if (configurationFile != null && !configurationFile.trim().isEmpty()) {
@@ -65,7 +67,7 @@ public abstract class AbstractJavadocFillInMojo
         getLog().info("Loaded Variables From POM");
         loadExceptionsFromPOM(exceptions);
         getLog().info("Loaded Exceptions From POM");
-        exceptionsMap.keySet().forEach(key->getLog().info(key + " = "+exceptionsMap.get(key)));
+        exceptionsMap.keySet().forEach(key -> getLog().info(key + " = " + exceptionsMap.get(key)));
         this.javaFiles = getFiles();
         getLog().info("Total Java Files: " + this.javaFiles.size());
         doExecute();
