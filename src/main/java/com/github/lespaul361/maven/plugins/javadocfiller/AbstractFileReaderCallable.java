@@ -47,34 +47,28 @@ abstract class AbstractFileReaderCallable implements Callable<String>, JavaDocFi
     }
 
     private void readFile() {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            try (InputStreamReader isr = new InputStreamReader(fis)) {
-                try {
-                    br = new BufferedReader(isr);
-                    String javadocComment = null;
-                    while ((javadocComment = getNextComment()) != null) {
-                        String processed = processJavaDoc(javadocComment);
-                        if (!processed.endsWith(System.lineSeparator())) {
-                            processed += System.lineSeparator();
-                        }
-                        if (!processed.equals(javadocComment)) {
-                            isUpdated = true;
-                            sbNewFile.append(processed);
-                        } else {
-                            sbNewFile.append(javadocComment);
-                        }
-                    }
-                    br.close();
-                    isr.close();
-                    fis.close();
-                } catch (java.lang.Exception ebr) {
-                    ebr.printStackTrace(System.err);
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            br = new BufferedReader(isr);
+            String javadocComment = null;
+            while ((javadocComment = getNextComment()) != null) {
+                String processed = processJavaDoc(javadocComment);
+                if (!processed.endsWith(System.lineSeparator())) {
+                    processed += System.lineSeparator();
                 }
-            } catch (java.lang.Exception eisr) {
-                eisr.printStackTrace(System.err);
+                if (!processed.equals(javadocComment)) {
+                    isUpdated = true;
+                    sbNewFile.append(processed);
+                } else {
+                    sbNewFile.append(javadocComment);
+                }
             }
-        } catch (java.lang.Exception efis) {
-            efis.printStackTrace(System.err);
+            br.close();
+            isr.close();
+            fis.close();
+        } catch (java.lang.Exception e) {
+            e.printStackTrace(System.err);
         }
 
         if (isUpdated) {

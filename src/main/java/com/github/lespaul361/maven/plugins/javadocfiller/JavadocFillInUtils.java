@@ -63,7 +63,14 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
                     if (nextLineParts[0].trim().equals(END_JAVADOC.trim())
                             || nextLineParts[1].equals(SEPARATOR_JAVADOC.trim())
                             || nextLineParts[1].equals(START_OF_TAG.trim())) {
-                        String desc = exs.get(curThrowName);
+                        String desc = null;
+                        if (curThrowName.contains(".")) {
+                            String name = curThrowName.substring(curThrowName.lastIndexOf("."));
+                            desc = exs.get(name);
+                        } else {
+                            desc = exs.get(curThrowName);
+                        }
+
                         if (sbNewComment.charAt(sbNewComment.length() - 1) != " ".charAt(0)) {
                             sbNewComment.append(" ");
                         }

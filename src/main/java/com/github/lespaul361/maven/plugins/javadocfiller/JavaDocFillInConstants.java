@@ -6,7 +6,7 @@
 package com.github.lespaul361.maven.plugins.javadocfiller;
 
 /**
- *
+ * 
  * @author David Hamilton
  */
 interface JavaDocFillInConstants {
