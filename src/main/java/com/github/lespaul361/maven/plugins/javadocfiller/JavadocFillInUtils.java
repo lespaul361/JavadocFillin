@@ -14,8 +14,7 @@ import java.util.Map;
  */
 public class JavadocFillInUtils implements JavaDocFillInConstants {
 
-    public static synchronized String replaceVariables(String javadocComment,
-            Map<String, String> variables) {
+    public static synchronized String replaceVariables(String javadocComment, Map<String, String> variables) {
         if (javadocComment == null) {
             throw new NullPointerException("comment is null");
         }
@@ -33,8 +32,7 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
         return javadocComment;
     }
 
-    public static synchronized String addGenericDescriptionForException(
-            String javadocComment, Map<String, String> exs) {
+    public static synchronized String addGenericDescriptionForException(String javadocComment, Map<String, String> exs) {
         if (javadocComment == null) {
             throw new NullPointerException("comment is null");
         }
@@ -62,32 +60,29 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
                     String[] nextLineParts = lines[1].trim().split("\\s+");
                     if (nextLineParts[0].trim().equals(END_JAVADOC.trim())
                             || nextLineParts[1].equals(SEPARATOR_JAVADOC.trim())
-                            || nextLineParts[1].equals(START_OF_TAG.trim())) {
+                            || nextLineParts[1].startsWith(START_OF_TAG.trim())) {
                         String desc = null;
-                        if (curThrowName.contains(".")) {
-                            String name = curThrowName.substring(curThrowName.lastIndexOf("."));
+                        if (curThrowName.contains(".") && curThrowName.startsWith("java.")) {
+                            String name = curThrowName.substring(curThrowName.lastIndexOf(".") + 1);
                             desc = exs.get(name);
                         } else {
                             desc = exs.get(curThrowName);
                         }
-
-                        if (sbNewComment.charAt(sbNewComment.length() - 1) != " ".charAt(0)) {
-                            sbNewComment.append(" ");
-                        }
+                        checkAppendSpace(sbNewComment);
                         if (desc != null) {
                             sbNewComment.append(curThrowName)
                                     .append(" ")
                                     .append(desc)
                                     .append(EOL);
                             for (int ii = 1; ii < lines.length; ii++) {
-                                sbNewComment.append(lines[ii]);
+                                checkForEOL(sbNewComment).append(lines[ii]);
                             }
                         } else {
                             sbNewComment.append(curThrowName)
                                     .append(EOL);
                             if (lines.length > 0) {
                                 for (int ii = 1; ii < lines.length; ii++) {
-                                    sbNewComment.append(EOL).append(lines[ii]);
+                                    checkForEOL(sbNewComment).append(lines[ii]);
                                 }
                             }
                         }
@@ -106,11 +101,12 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
                     }
                 }
                 if (sbTemp.length() > 0) {
+                    checkAppendSpace(sbNewComment);
                     sbNewComment.append(sbTemp);
                 }
                 if (lineParts.length > 0) {
                     for (int ii = 1; ii < lines.length; ii++) {
-                        sbNewComment.append(lines[ii]);
+                        checkForEOL(sbNewComment).append(lines[ii]);
                     }
                 }
             }
@@ -118,5 +114,19 @@ public class JavadocFillInUtils implements JavaDocFillInConstants {
         }
 
         return sbNewComment.toString();
+    }
+
+    private static StringBuilder checkAppendSpace(StringBuilder sb) {
+        if (sb.charAt(sb.length() - 1) != " ".charAt(0)) {
+            sb.append(" ");
+        }
+        return sb;
+    }
+
+    private static StringBuilder checkForEOL(StringBuilder sb) {
+        if (!sb.toString().endsWith(EOL)) {
+            sb.append(EOL);
+        }
+        return sb;
     }
 }
