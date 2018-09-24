@@ -14,11 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
+import javax.lang.model.util.Elements;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.xalan.xsltc.dom.SAXImpl.NamespaceWildcardIterator;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -42,7 +47,7 @@ public abstract class AbstractJavadocFillInMojo extends AbstractMojo {
 	private List<Filler> fillers;
 
 	@Parameter
-	private List<Filler> addFillersConfig;
+	private List<Filler> addFillersToConfig;
 
 	@Parameter
 	private List<com.github.lespaul361.maven.plugins.javadocfiller.Exception> addExceptionsConfig;
@@ -95,6 +100,9 @@ public abstract class AbstractJavadocFillInMojo extends AbstractMojo {
 			Document doc = sax.build(file);
 			Element root = doc.getRootElement();
 			Element element = root.getChild("fillers");
+			if (element == null) {
+				return;
+			}
 			List<Element> elements = element.getChildren();
 
 			elements.forEach(el -> {
@@ -225,29 +233,79 @@ public abstract class AbstractJavadocFillInMojo extends AbstractMojo {
 	public abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
 	protected void addVariavlesToConfig(File file) {
-		final List<String>variableNamesExisting=new ArrayList<>(50);		
-		if (addFillersConfig == null || addFillersConfig.size() != 0) {
+		if (addFillersToConfig == null || addFillersToConfig.isEmpty()) {
 			return;
 		}
-
-		if (!file.exists()) {
-			getLog().warn(String.format("Configuation file was not found at %s", file.getAbsolutePath()));
-			return;
-		}
-
+		
+		addFillersToConfig.sort((c1, c2) -> {
+			return c1.variable.compareTo(c2.variable);
+		});
+		
 		try {
 			SAXBuilder sax = new SAXBuilder();
 			Document doc = sax.build(file);
 			Element root = doc.getRootElement();
-			Element mainNode=root.getChild("fillers");
-			List<Element> elements = mainNode.getChildren();
-			//TODO: get names of variables and compare them to what is being added
-				
-				
+			Element element = root.getChild("fillers");
+			if (element==null) {
+				element=new Element("filler");				
 			}
+			boolean updateFile=false;
+			for(Filler filler:addFillersToConfig) {
+				if(!(isFillExistsInList(element, "variable", filler.variable))) {
+					Element eleVar=new Element("variable");
+					eleVar.setText(filler.variable);
+					Element eleText=new Element("text");
+					eleText.setText(filler.text);
+					Element f=new Element("filler");
+					f.addContent(eleVar);
+					f.addContent(eleText);
+					element.addContent(f);
+					updateFile=true;
+				}				
+			}
+			if(updateFile) {
+				org.jdom2.output.StAXStreamOutputter out =new org.jdom2.output.StAXStreamOutputter();
+				out.
+			}
+			sax = null;
 		} catch (java.lang.Exception e) {
-			// TODO: handle exception
+			e.printStackTrace(System.err);
+		}
+	}
+
+	private boolean isFillExistsInList(Element element, String elementName, String varName) {
+		List<Element> children = element.getChildren();
+		String eleText = null;
+		if (children.size() == 0) {
+			return false;
+		}
+		if (children.size() == 1) {
+			eleText = children.get(0).getChildText(elementName);
+			return eleText.compareTo(varName) == 0;
+
 		}
 
+		short top = (short) children.size();
+		short bottom = 0;
+		short index = 0;
+		short response = 0;
+
+		while (true) {
+			index = (short) (((top - bottom) / 2) + bottom);
+			eleText = children.get(0).getChildText(elementName);
+			response = (short) eleText.compareTo(varName);
+			if (response == 0) {
+				return true;
+			} else if (response < 0) {
+				top = index;
+			} else {
+				bottom = index;
+			}
+			if((top-bottom)==1) {
+				index = (short) (((top - bottom) / 2) + bottom);
+				eleText = children.get(index).getChildText(elementName);
+				return eleText.compareTo(varName) == 0;
+			}
+		}
 	}
 }

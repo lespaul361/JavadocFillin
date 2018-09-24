@@ -30,18 +30,13 @@ public class JavaDocFillCompleteMojo extends AbstractJavadocFillInMojo {
 
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        ExecutorService executor = Executors.newFixedThreadPool(5);
         List<Future<String>> futures = new ArrayList<>();
         for (File file : javaFiles) {
             Callable c = new CompleteFillerCallable(exceptionsMap, fillersMap,
                     file, encoding, jdkVersion);
-            try {
-                getLog().info("single");
-                getLog().info((String) c.call());
-            } catch (java.lang.Exception e) {
-            }
-
-        }
+         }
+        
         futures.forEach(f -> {
             try {
                 getLog().info(f.get());
