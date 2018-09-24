@@ -6,6 +6,7 @@
 package com.github.lespaul361.maven.plugins.javadocfiller;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,8 @@ import org.apache.xalan.xsltc.dom.SAXImpl.NamespaceWildcardIterator;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  *
@@ -232,40 +235,83 @@ public abstract class AbstractJavadocFillInMojo extends AbstractMojo {
 	 */
 	public abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
-	protected void addVariavlesToConfig(File file) {
+	protected void addVariablesToConfig(File file) {
 		if (addFillersToConfig == null || addFillersToConfig.isEmpty()) {
 			return;
 		}
-		
+
 		addFillersToConfig.sort((c1, c2) -> {
 			return c1.variable.compareTo(c2.variable);
 		});
-		
+
 		try {
 			SAXBuilder sax = new SAXBuilder();
 			Document doc = sax.build(file);
 			Element root = doc.getRootElement();
 			Element element = root.getChild("fillers");
-			if (element==null) {
-				element=new Element("filler");				
+			if (element == null) {
+				element = new Element("fillers");
 			}
-			boolean updateFile=false;
-			for(Filler filler:addFillersToConfig) {
-				if(!(isFillExistsInList(element, "variable", filler.variable))) {
-					Element eleVar=new Element("variable");
+			boolean updateFile = false;
+			for (Filler filler : addFillersToConfig) {
+				if (!(isFillExistsInList(element, "variable", filler.variable))) {
+					Element eleVar = new Element("variable");
 					eleVar.setText(filler.variable);
-					Element eleText=new Element("text");
+					Element eleText = new Element("text");
 					eleText.setText(filler.text);
-					Element f=new Element("filler");
+					Element f = new Element("filler");
 					f.addContent(eleVar);
 					f.addContent(eleText);
 					element.addContent(f);
-					updateFile=true;
-				}				
+					updateFile = true;
+				}
 			}
-			if(updateFile) {
-				org.jdom2.output.StAXStreamOutputter out =new org.jdom2.output.StAXStreamOutputter();
-				out.
+			if (updateFile) {
+				XMLOutputter outputter = new XMLOutputter();
+				outputter.setFormat(Format.getPrettyFormat());
+				outputter.output(doc, new FileWriter(configurationFile));
+			}
+			sax = null;
+		} catch (java.lang.Exception e) {
+			e.printStackTrace(System.err);
+		}
+	}
+
+	protected void addExceptionsToConfig(File file) {
+		if (addExceptionsConfig == null || addExceptionsConfig.isEmpty()) {
+			return;
+		}
+
+		addExceptionsConfig.sort((c1, c2) -> {
+			return c1.name.compareTo(c2.name);
+		});
+
+		try {
+			SAXBuilder sax = new SAXBuilder();
+			Document doc = sax.build(file);
+			Element root = doc.getRootElement();
+			Element element = root.getChild("exceptions");
+			if (element == null) {
+				element = new Element("exceptions");
+			}
+			boolean updateFile = false;
+			for (Exception ex : addExceptionsConfig) {
+				if (!(isFillExistsInList(element, "name", ex.name))) {
+					Element eleVar = new Element("name");
+					eleVar.setText(ex.name);
+					Element eleText = new Element("text");
+					eleText.setText(ex.description);
+					Element f = new Element("exception");
+					f.addContent(eleVar);
+					f.addContent(eleText);
+					element.addContent(f);
+					updateFile = true;
+				}
+			}
+			if (updateFile) {
+				XMLOutputter outputter = new XMLOutputter();
+				outputter.setFormat(Format.getPrettyFormat());
+				outputter.output(doc, new FileWriter(configurationFile));
 			}
 			sax = null;
 		} catch (java.lang.Exception e) {
@@ -287,25 +333,27 @@ public abstract class AbstractJavadocFillInMojo extends AbstractMojo {
 
 		short top = (short) children.size();
 		short bottom = 0;
-		short index = 0;
+		short index = (short) (((top - bottom) / 2) + bottom);
 		short response = 0;
 
-		while (true) {
-			index = (short) (((top - bottom) / 2) + bottom);
+		while (index != 0) {
 			eleText = children.get(0).getChildText(elementName);
 			response = (short) eleText.compareTo(varName);
 			if (response == 0) {
 				return true;
 			} else if (response < 0) {
-				top = index;
-			} else {
 				bottom = index;
+				index += (short) ((top - bottom) / 2);
+			} else {
+				top = index;
+				index -= (short) ((top - bottom) / 2);
 			}
-			if((top-bottom)==1) {
+			if ((top - bottom) == 1) {
 				index = (short) (((top - bottom) / 2) + bottom);
 				eleText = children.get(index).getChildText(elementName);
 				return eleText.compareTo(varName) == 0;
 			}
 		}
+		return false;
 	}
 }
